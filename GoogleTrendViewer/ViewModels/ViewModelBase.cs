@@ -1,8 +1,7 @@
 ﻿using ReactiveUI;
 
-namespace GoogleTrendViewer.ViewModels
+namespace GoogleTrendViewer.ViewModels;
+
+public class ViewModelBase : ReactiveObject
 {
-    public class ViewModelBase : ReactiveObject
-    {
-    }
 }

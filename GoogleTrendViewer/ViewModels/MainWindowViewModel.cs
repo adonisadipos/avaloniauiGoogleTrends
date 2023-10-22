@@ -1,44 +1,42 @@
 ﻿using GoogleTrendViewer.Services;
 using System.Collections.ObjectModel;
 
-namespace GoogleTrendViewer.ViewModels
+namespace GoogleTrendViewer.ViewModels;
+
+public class MainWindowViewModel : ViewModelBase
 {
-    public class MainWindowViewModel : ViewModelBase
+    private readonly GoogleTrendService trendService = new GoogleTrendService();
+    public ObservableCollection<TrendItemViewModel> Items { get; set; }
+
+    public MainWindowViewModel()
     {
-        private GoogleTrendService trendService = new GoogleTrendService();
-        public ObservableCollection<TrendItemViewModel> Items { get; set; }
+        Items = new ObservableCollection<TrendItemViewModel>();
+        var trendUrl = "https://trends.google.com/trends/trendingsearches/daily/rss?geo=DE";
+        var googleTrendItems = trendService.GetTodayTrends(trendUrl);
 
-        public MainWindowViewModel()
+        for (int i = 0; i < googleTrendItems.Count; i++)
         {
-            Items = new ObservableCollection<TrendItemViewModel>();
-            var trendUrl = "https://trends.google.com.vn/trends/trendingsearches/daily/rss?geo=VN";
-            var googleTrendItems = trendService.GetTodayTrends(trendUrl);
+            var googleTrendItem = googleTrendItems[i];
 
-            for (int i = 0; i < googleTrendItems.Count; i++)
+            var trendItem = new TrendItemViewModel
             {
-                var googleTrendItem = googleTrendItems[i];
+                Title = googleTrendItem.Title,
+                Traffic = googleTrendItem.Traffic,
+                Image = googleTrendItem.Picture,
+                Number = i + 1,
+                Description = googleTrendItem.Description,
+            };
 
-                var trendItem = new TrendItemViewModel
-                {
-                    Title = googleTrendItem.Title,
-                    Traffic = googleTrendItem.Traffic,
-                    Image = googleTrendItem.Picture,
-                    Number = i + 1,
-                    Description = googleTrendItem.Description,
-                };
+            trendItem.NewsItems = new ObservableCollection<TrendNewsItemViewModel>();
 
-                trendItem.NewsItems = new ObservableCollection<TrendNewsItemViewModel>();
-
-                foreach(var news in googleTrendItem.NewsItems)
-                {
-                    var newsItem = new TrendNewsItemViewModel { Title = news.Title, Description = news.Description, Url = news.Url };
-                    trendItem.NewsItems.Add(newsItem);
-                }
-                
-
-                Items.Add(trendItem);
+            foreach (var news in googleTrendItem.NewsItems)
+            {
+                var newsItem = new TrendNewsItemViewModel { Title = news.Title, Description = news.Description, Url = news.Url };
+                trendItem.NewsItems.Add(newsItem);
             }
 
+            Items.Add(trendItem);
         }
+
     }
 }
